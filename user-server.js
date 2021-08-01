@@ -96,3 +96,35 @@ server.post('/find-or-create', async (req, res, next) => {
         next(false);
     }
 });
+
+server.get('/find/:username', async (req, res, next) => {
+    try {
+        await connectDB();
+        const user = await findOneUser(req.params.username);
+        if (!user) {
+            res.send(404, new Error("Did not find " + req.params.username));
+        } else {
+            res.contentType = 'json';
+            res.send(user);
+        }
+        next(false);
+    } catch (err) {
+        res.send(500, err);
+        next(false);
+    }
+});
+
+server.get('/list', async (req, res, next) => {
+    try {
+        await connectDB();
+        let userlist = await SQUser.findAll();
+        userlist = userlist.map(user => sanitizedUser(user));
+        if (!userlist) userlist = [];
+        res.contentType = 'json';
+        res.send(userlist);
+        next(false);
+    } catch (err) {
+        res.send(500, err);
+        next(false);
+    }
+})
