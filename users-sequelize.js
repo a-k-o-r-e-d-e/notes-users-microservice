@@ -104,3 +104,16 @@ export function sanitizedUser (user) {
 
     return ret;
 }
+
+export async function findOneUser (username) {
+    let user = await SQUser.findOne({ where: { username: username } });
+    user = user ? sanitizedUser(user) : undefined;
+    return user;
+}
+
+export async function createUser (req) {
+    let toCreate = userParams(req);
+    await SQUser.create(toCreate);
+    const result = await findOneUser(req.params.username);
+    return result;
+}

@@ -3,9 +3,8 @@ import * as util from 'util';
 import { 
     SQUser, connectDB, userParams,
     sanitizedUser, createUser, findOneUser
-     } from "./users-sequelize";
+     } from "./users-sequelize.js";
 import DBG from 'debug';
-import { authorizationParser } from 'restify/lib/plugins';
 
 const log = DBG('users:service');
 const error = DBG('users:error');
@@ -14,7 +13,7 @@ const error = DBG('users:error');
 
 var server = restify.createServer({
     name: "User-Auth-Service",
-    version: "0.o.1"
+    version: "0.0.1"
 });
 
 server.use(restify.plugins.authorizationParser());
@@ -23,7 +22,7 @@ server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser({ mapParams: true }));
 
 server.listen(process.env.PORT, "localhost", function () {
-    log(server.name + ' listening at ' + server.util);
+    log(server.name + ' listening at ' + server.url);
 });
 
 process.on('uncaughtException', function (err) {
@@ -68,15 +67,32 @@ function check (req, res, next) {
     }
 }
 
-export async function findOneUser (username) {
-    let user = await SQUser.findOne({ where: { username: username } });
-    user = user ? sanitizedUser(user) : undefined;
-    return user;
-}
+server.post('/create-user', async (req, res, next) => {
+    try {
+        await connectDB();
+        let result = await createUser(req);
+        res.connectType = 'json';
+        res.send(result);
+        next(false);
+    } catch (err) {
+        res.send(500, err);
+        next(false);
+    }
+});
 
-export async function createUser (req) {
-    let toCreate = userParams(req);
-    await SQUser.create(toCreate);
-    const result = await findOneUser(req.params.username);
-    return result;
-}
+server.post('/find-or-create', async (req, res, next) => {
+    try {
+        await connectDB();
+        let user = await findOneUser(req.params.username);
+        if (!user) {
+            user = await createUser(req);
+            if (!user) throw new Error('No user created');
+        }
+        res.connectType = 'json';
+        res.send(user);
+        return next(false);
+    } catch (err) {
+        res.send(500, err);
+        next(false);
+    }
+});
