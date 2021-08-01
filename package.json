@@ -1,5 +1,6 @@
 {
   "name": "user-auth-server",
+  "type": "module",
   "version": "1.0.0",
   "description": "A Microservice for authenticating Notes Application Users",
   "main": "user-server.js",
