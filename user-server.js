@@ -128,3 +128,18 @@ server.get('/list', async (req, res, next) => {
         next(false);
     }
 })
+
+server.post('/update-user/:username', async (req, res, next) => {
+    try {
+        await connectDB();
+        let toupdate = userParams(req);
+        await SQUser.update(toupdate, { where: { username: req.params.username } });
+        const result = await findOneUser(req.params.username);
+        res.connectType = 'json';
+        res.send(result);
+        next(false);
+    } catch (err) {
+        res.send(500, err);
+        next(false);
+    }
+});
