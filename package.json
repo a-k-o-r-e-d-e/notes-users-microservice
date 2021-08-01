@@ -1,0 +1,23 @@
+{
+  "name": "user-auth-server",
+  "version": "1.0.0",
+  "description": "A Microservice for authenticating Notes Application Users",
+  "main": "user-server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "cross-env DEBUG=users:* PORT=5858 SEQUELIZE_CONNECT=sequelize-sqlite.yaml node ./user-server.js"  
+  },
+  "author": "Lone Wolf",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^8.1.0",
+    "cross-env": "^7.0.3",
+    "debug": "^4.3.2",
+    "fs-extra": "^10.0.0",
+    "js-yaml": "^4.1.0",
+    "restify": "^8.5.1",
+    "restify-clients": "^3.1.0",
+    "sequelize": "^6.6.5",
+    "sqlite3": "^5.0.2"
+  }
+}
